@@ -1,29 +1,21 @@
-variable "prenom" {
-  type    = string
-  default = "harold"
+variable "instance_type" {
+  default = "t2.micro"
 }
 
-variable "tag_ec2" {
+variable "ec2_tag" {
   type = map(any)
-  default = {
-    Name      = "ec2-harold"
-    Formation = "ajc"
-  }
 }
 
-variable "taille_ec2" {
-  default = "t2.nano"
+variable "key_name" {
+  type = string
+  description = "key_pairs name"
 }
 
 variable "sg_name" {
-  default = "harold_sg"
+  type = string
 }
 
-variable "keyname_type" {
-  default = "devops-harold"
-}
-
-variable "path_key_ssh" {
-  type    = string
-  default = "C:/Users/rouss/OneDrive/Bureau/devops-harold.pem"
+variable "key_path" {
+  type = string
+  description = "path to private key for ssh connexion"
 }

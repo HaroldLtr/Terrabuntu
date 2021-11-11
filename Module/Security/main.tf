@@ -1,7 +1,8 @@
 #the security group
-resource "aws_security_group" "amandine-sg" {
+resource "aws_security_group" "harold_sg" {
   name        = var.sg_name
-
+  description = "sg for tls, http, ssh"
+  
   ingress {
     description = "TLS from VPC"
     from_port   = 443

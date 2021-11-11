@@ -1,5 +1,5 @@
 
-data "aws_ami" "ubuntu" {
+data "aws_ami" "ami_ubuntu_bionic" {
   most_recent = true
   owners      = ["099720109477"]
 
@@ -9,32 +9,37 @@ data "aws_ami" "ubuntu" {
   }
 }
 
-resource "aws_instance" "pg_t2" {
-  ami             = data.aws_ami.ubuntu.id
-  instance_type   = var.taille_ec2
-  key_name        = var.keyname_type
-  security_groups = [module.sg.sgname]
+#create ec2
+resource "aws_instance" "web_ec2" {
+  ami             = data.aws_ami.ami_ubuntu_bionic.id
+  instance_type   = var.instance_type
+  key_name        = var.key_name
+  security_groups = [var.sg_name]
+  
+  tags = var.ec2_tag
 
-  tags = var.tag_ec2
-
-  root_block_device {
-    delete_on_termination = true
+#provisioner local: creer file and copy public_ip
+provisioner "local-exec" {
+    command = "echo ${aws_instance.web_ec2.public_ip} >> ip_ec2.txt"
   }
 
+#provisioner remote(distant):install and start nginx after creating our vm
   provisioner "remote-exec" {
     inline = [
-      "sudo amazon-linux-extras install -y nginx1",
-      "sudo systemctl enabled nginx",
-      "sudo systemctl start nginx"
+      "sudo apt install -y nginx",
+      "sudo systemctl start nginx",
     ]
-
   }
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.path_key_ssh)
+    private_key = file(var.key_path)
     host        = self.public_ip
+    timeout     = "30s"
   }
 
+  root_block_device {
+    delete_on_termination = true
+  }
 }
